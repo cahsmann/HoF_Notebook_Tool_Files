@@ -27,9 +27,9 @@ parser.add_argument('--n_layer', type=int, default=6, help='Number of hidden lay
 parser.add_argument('--dim', type=int, default=128, help='Size of input hidden units.')
 parser.add_argument('--dataset', type=str, default="QM9", help='Dataset')
 parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
-parser.add_argument('--target', type=int, default="12", help='Index of target (0~11) for prediction')
+parser.add_argument('--target', type=int, default=12, help='Index of target (0~11) for prediction')
 parser.add_argument('--cutoff', type=float, default=5.0, help='Distance cutoff used in the global layer')
-
+parser.add_argument('--scale', type=float, default=1, help='Percentage of data used')
 args = parser.parse_args()
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -72,16 +72,9 @@ path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', 'QM9')
 dataset = QM9(path, transform=MyTransform()).shuffle()
 print('# of graphs:', len(dataset))
 
-# Split dataset
-#train_dataset = dataset[:110000]
-#val_dataset = dataset[110000:120000]
-#test_dataset = dataset[120000:]
-
-SET_SCALE = float(input("Enter Set Scale (0 - 1): "))
-
-TRAIN_START = int(110000 * SET_SCALE)
-VAL_END = TRAIN_START + int(10000 * SET_SCALE)
-TEST_END = VAL_END + int(10000 * SET_SCALE)
+TRAIN_START = int(110000 * args.scale)
+VAL_END = TRAIN_START + int(10000 * args.scale)
+TEST_END = VAL_END + int(10000 * args.scale)
 
 train_dataset = dataset[:TRAIN_START]
 val_dataset = dataset[TRAIN_START:VAL_END]
